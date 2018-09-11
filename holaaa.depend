@@ -1,9 +1,0 @@
-# depslib dependency file v1.0
-1536638459 source:c:\users\usuario\desktop\proyectos c++\holaaa\main.cpp
-	<iostream>
-	<fstream>
-	<cstdlib>
-	<string>
-	<vector>
-	<windows.h>
-
