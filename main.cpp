@@ -9,7 +9,7 @@ using namespace std;
 
 typedef struct Nodo{
     int numero;
-    bool esFijo;
+    bool esFijo; //para comprobar si es ingresado por la consola
     Nodo* link;
 };
 typedef Nodo* Lista;
@@ -31,64 +31,114 @@ bool esNumero(char valor){
 }
 
 void mostrarMatriz(){
+    Lista p;
+    p = new(Nodo);
 	for(int i=0;i<9;i++){
 		for(int j=0;j<9;j++){
-            if(matriz[i][j]->link == NULL){
-			    cout<<matriz[i][j]->numero<<" ";
-            }
+            cout<<matriz[i][j]->numero<<" ";
 		}
 		cout<<endl;
+        if(i==2 || i==5){
+             cout<<"-----------------"<<endl;
+        }
 	}
 }
 
+void darIndiceSubMatriz(int i, int j, int &ini_i, int &ini_j,int &fin_i, int &fin_j){
+    if(i>=0 && i<=2){
+        ini_i=0;
+        fin_i=2;
+    }
+    else {
+        if(i>=3 && i<=5){
+            ini_i=3;
+            fin_i=5;
+        }
+        else{
+            ini_i=6;
+            fin_i=8;
+        }
+    }
+
+    if(j>=0 && j<=2){
+        ini_j=0;
+        fin_j=2;
+    }
+    else{
+        if(j>=3 && j<=5){
+            ini_j=3;
+            fin_j=5;
+        }
+        else{
+            ini_j=6;
+            fin_j=8;
+        }
+    }
+}
+
 bool revisarSubMatriz(int i, int j, int valor){
-    Lista p;
-    p = new(Nodo);
-    for(int ii=0;ii<i;ii++){
-        for(int jj=0;jj<j;jj++){
-            p = matriz[ii][jj];
-            while(p->link != NULL){
-                if(matriz[ii][jj]->numero==valor){
-                    return true;
-                    p->link = NULL;
-                }
-                else{
-                    p = matriz[ii][jj]->link; 
-                }
+    int ini_i=0, ini_j=0, fin_i=0, fin_j=0;
+    darIndiceSubMatriz( i, j, ini_i, ini_j, fin_i, fin_j);
+    for(int m=ini_i;m<=fin_i;m++){
+        for(int n=ini_j;n<fin_j;n++){
+            if(matriz[m][n]->numero==valor){
+                return true;
             }
         }
     }
     return false;
 }
-/*
-void verificar(Lista aux){
+
+bool revisarFila(int i, int valor){
+    for(int j=0;j<9;j++){
+        if(matriz[i][j]->numero==valor){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool revisarColumna(int j, int valor){
+    for(int i=0;i<9;i++){
+        if(matriz[i][j]->numero==valor){
+            return true;
+        }
+    }
+    return false;
+}
+
+void revisarEnMatriz(int valor){
+    Lista p;
+    p = new(Nodo);
     for(int i=0;i<9;i++){
         for(int j=0;j<9;j++){
-            if(matriz[i][j]->esFijo==false){
-                for(int k=1;k<=9;k++){
-                    if(revisarSubMatriz(j,k,matriz[i][j]->numero)){
-                        matriz[i][j].push_back(k);
+            if(matriz[i][j]->numero==0){
+                if(!revisarSubMatriz(i,j,valor)){
+                    if(!revisarColumna(j,valor)){
+                        if(!revisarFila(i,valor) ){
+                            p->numero = valor;
+                            p->esFijo = false;
+                            p->link = NULL;
+                            matriz[i][j] = p;
+                        }
                     }
                 }
             }
         }
     }
 }
-*/
+
 int main(int argc, char* argv[]){
 
 	//Para ingresar los datos, se ingresa por ejemplo: ./ejecutable "[1;2;3][4;5;6][7;8;9]"
+    Lista p;
+    p=new(Nodo);
+	p->numero = 0;
+    p->esFijo = false;
+    p->link = NULL;
 	for(int i=0;i<9;i++){
 		for(int j=0;j<9;j++){
-            Lista p; 
-            p = matriz[i][j];
-            while(p->link != NULL){
-                cout<<"hola"<<endl;
-			    matriz[i][j]->numero = 0;
-                matriz[i][j]->esFijo = false;
-                matriz[i][j]->link = NULL;
-                p->link = NULL;
-            }
+            matriz[i][j] = p;
         }
     }
     
@@ -170,9 +220,12 @@ int main(int argc, char* argv[]){
     int j=0;
     while(j<largoDetalle){
         if(matriz[detalle[j]][detalle[j+1]]->numero==0){
-            matriz[detalle[j]][detalle[j+1]]->numero=detalle[j+2];
-            matriz[detalle[j]][detalle[j+1]]->esFijo = true;
-            matriz[detalle[j]][detalle[j+1]]->link = NULL;
+            Lista p;
+            p = new(Nodo);
+            p->numero=detalle[j+2];
+            p->esFijo = true;
+            p->link = NULL;
+            matriz[detalle[j]][detalle[j+1]] = p;
             j=j+3;
         }
         else{
@@ -180,12 +233,21 @@ int main(int argc, char* argv[]){
             j=j+3;
         }
     }
+    mostrarMatriz();
+    cout<<endl;
+
+	revisarEnMatriz(3);
 
     mostrarMatriz();
 
     for(int i=0;i<9;i++){
 		for(int j=0;j<9;j++){
-			fs<<matriz[i][j]->numero<<";";
+            if(j==8){
+                fs<<matriz[i][j]->numero;
+            }
+            else{
+			    fs<<matriz[i][j]->numero<<";";
+            }
         }
         fs<<endl;
     }
