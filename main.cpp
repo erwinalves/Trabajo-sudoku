@@ -14,7 +14,7 @@ typedef struct Nodo{
 };
 typedef Nodo* Lista;
 
-Lista matriz[9][9];
+Lista matriz[9][9];//matriz de listas, variable local
 
 int ConvierteANumero(char valor){
 	int n = (int)valor - 48;
@@ -35,7 +35,8 @@ void mostrarMatriz(){
     p = new(Nodo);
 	for(int i=0;i<9;i++){
 		for(int j=0;j<9;j++){
-            cout<<matriz[i][j]->numero<<" ";
+            p=matriz[i][j];
+            cout<<p->numero<<" ";
 		}
 		cout<<endl;
         if(i==2 || i==5){
@@ -55,8 +56,10 @@ void darIndiceSubMatriz(int i, int j, int &ini_i, int &ini_j,int &fin_i, int &fi
             fin_i=5;
         }
         else{
-            ini_i=6;
-            fin_i=8;
+            if(i>=6 && i<=8){
+                ini_i=6;
+                fin_i=8;
+            }
         }
     }
 
@@ -70,8 +73,10 @@ void darIndiceSubMatriz(int i, int j, int &ini_i, int &ini_j,int &fin_i, int &fi
             fin_j=5;
         }
         else{
-            ini_j=6;
-            fin_j=8;
+            if(j>=6 && j<=8){
+                ini_j=6;
+                fin_j=8;
+            }
         }
     }
 }
@@ -80,8 +85,8 @@ bool revisarSubMatriz(int i, int j, int valor){
     int ini_i=0, ini_j=0, fin_i=0, fin_j=0;
     darIndiceSubMatriz( i, j, ini_i, ini_j, fin_i, fin_j);
     for(int m=ini_i;m<=fin_i;m++){
-        for(int n=ini_j;n<fin_j;n++){
-            if(matriz[m][n]->numero==valor){
+        for(int n=ini_j;n<=fin_j;n++){
+            if(matriz[m][n]->numero==valor && matriz[m][n]->esFijo){
                 return true;
             }
         }
@@ -91,7 +96,7 @@ bool revisarSubMatriz(int i, int j, int valor){
 
 bool revisarFila(int i, int valor){
     for(int j=0;j<9;j++){
-        if(matriz[i][j]->numero==valor){
+        if(matriz[i][j]->numero==valor && matriz[i][j]->esFijo){
             return true;
         }
     }
@@ -100,26 +105,263 @@ bool revisarFila(int i, int valor){
 
 bool revisarColumna(int j, int valor){
     for(int i=0;i<9;i++){
-        if(matriz[i][j]->numero==valor){
+        if(matriz[i][j]->numero==valor && matriz[i][j]->esFijo){
             return true;
         }
     }
     return false;
 }
 
-void revisarEnMatriz(int valor){
+void mostrarListas(Lista m){
     Lista p;
     p = new(Nodo);
+    cout<<"matriz = ";
+    if(m->link==NULL){
+        cout<<m->numero<<endl;
+    }
+    else{
+        p=m;
+        while(p->link!=NULL){
+            cout<<p->numero;
+            p = p->link;
+            if(p->link!=NULL){
+                cout<<" -> ";
+            }
+            else{
+                cout<<" -> "<<p->numero<<endl;
+            }
+        }
+    }
+}
+
+int encontrarMayor(int vector[]){
+    int aux=0;
+    for(int i=0;i<9;i++){
+        if(vector[aux]<vector[i]){
+            aux=i;
+        }
+    }
+    vector[aux]=-1;
+    return aux;
+}
+
+void verificarTodosLlenos(bool &respuesta, int &contador){
+    contador =0;
+    respuesta = false;
     for(int i=0;i<9;i++){
         for(int j=0;j<9;j++){
-            if(matriz[i][j]->numero==0){
-                if(!revisarSubMatriz(i,j,valor)){
+            if(matriz[i][j]->esFijo==true){
+                contador++;
+            }
+            if(contador==81){
+                respuesta = true;
+            }
+            else{
+                if(contador < 81){
+                    respuesta = false;
+                }
+            }
+        }
+    }
+}
+
+bool estaEnLista(int valor, Lista l){
+    Lista p;
+    p = new(Nodo);
+    p = l;
+    while(p->link!=NULL){
+        if(p->numero == valor){
+            return true;
+        }
+        p = p->link;
+        if(p->numero == valor && p->link == NULL){
+            return true;
+        }
+    }
+    return false;
+}
+
+void eliminarValorLista(int valor, int i, int j){
+    Lista p,l;
+    for(int jj=0;jj<9;jj++){//recorrer columna
+        if(matriz[i][jj]->esFijo==false && matriz[i][jj]->link!=NULL && estaEnLista(valor,matriz[i][jj])){
+            Lista pp,ll;
+            pp = new(Nodo);
+            ll = new(Nodo);
+            ll = matriz[i][jj];
+            pp = matriz[i][jj]->link;
+            if(pp->link==NULL){
+                if(ll->numero==valor){
+                    matriz[i][jj] = pp;
+                    ll->link=NULL;
+                }
+                else{
+                    if(pp->numero==valor){
+                        matriz[i][jj]->link=NULL;
+                    }
+                }
+            }
+            else{
+                if(ll->numero==valor){
+                    matriz[i][jj] = pp;
+                    ll->link=NULL;
+                }
+                else{
+                    if(pp->numero==valor){
+                        matriz[i][jj]->link = pp->link;
+                        pp->link=NULL;
+                    }
+                    else{
+                        while(pp->link != NULL){
+                            if(pp->numero == valor){
+                                ll->link = pp->link;
+                                pp->link=NULL;
+                            }
+                            else{
+                                pp = pp->link;
+                                ll = ll->link;
+                                if(pp->link == NULL && pp->numero==valor){
+                                    ll->link=NULL;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    for(int ii=0;ii<9;ii++){//recorrer fila
+        if(matriz[ii][j]->esFijo==false && matriz[ii][j]->link!=NULL && estaEnLista(valor,matriz[ii][j])){
+            Lista p,l;
+            p = new(Nodo);
+            l = new(Nodo);
+            l = matriz[ii][j];
+            p = matriz[ii][j]->link;
+            if(p->link==NULL){
+                if(l->numero==valor){
+                    matriz[ii][j] = p;
+                    l->link=NULL;
+                }
+                else{
+                    if(p->numero==valor){
+                        matriz[ii][j]->link=NULL;
+                    }
+                }
+            }
+            else{
+                if(l->numero==valor){
+                    matriz[ii][j] = p;
+                    l->link=NULL;
+                }
+                else{
+                    if(p->numero==valor){
+                        matriz[ii][j]->link = p->link;
+                        p->link=NULL;
+                    }
+                    else{
+                        while(p->link != NULL){
+                            if(p->numero == valor){
+                                l->link = p->link;
+                                p->link=NULL;
+                            }
+                            else{
+                                p = p->link;
+                                l = l->link;
+                                if(p->link == NULL && p->numero==valor){
+                                    l->link=NULL;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    int ini_i=0, ini_j=0, fin_i=0, fin_j=0;
+    darIndiceSubMatriz( i, j, ini_i, ini_j, fin_i, fin_j);
+    for(int m=ini_i;m<=fin_i;m++){// recorrer submatriz
+        for(int n=ini_j;n<=fin_j;n++){
+            if(matriz[m][n]->esFijo==false && matriz[m][n]->link!=NULL && estaEnLista(valor,matriz[m][n])){
+                Lista ppp,lll;
+                ppp = new(Nodo);
+                lll = new(Nodo);
+                ppp = matriz[m][n]->link;
+                lll = matriz[m][n];
+                if(ppp->link==NULL){
+                    if(lll->numero==valor){
+                        matriz[m][n] = ppp;
+                        lll->link=NULL;
+                    }
+                    else{
+                        if(ppp->numero==valor){
+                            matriz[m][n]->link=NULL;
+                        }
+                    }
+                }
+                else{
+                    if(lll->numero==valor){
+                        matriz[m][n] = ppp;
+                        lll->link=NULL;
+                    }
+                    else{
+                        if(ppp->numero==valor){
+                            matriz[m][n]->link = ppp->link;
+                            ppp->link=NULL;
+                        }
+                        else{
+                            while(ppp->link != NULL){
+                                if(ppp->numero == valor){
+                                    lll->link = ppp->link;
+                                    ppp->link=NULL;
+                                }
+                                else{
+                                    ppp = ppp->link;
+                                    lll = lll->link;
+                                    if(ppp->link == NULL && ppp->numero==valor){
+                                        lll->link=NULL;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void revisarEnMatriz(int valor, int aux[][9]){
+    for(int i=0;i<9;i++){
+        for(int j=0;j<9;j++){
+            if(matriz[i][j]->esFijo==false){
+                if(!revisarFila(i,valor)){
                     if(!revisarColumna(j,valor)){
-                        if(!revisarFila(i,valor) ){
+                        if(!revisarSubMatriz(i,j,valor)){
+                            Lista p;
+                            p = new(Nodo);
                             p->numero = valor;
                             p->esFijo = false;
                             p->link = NULL;
-                            matriz[i][j] = p;
+                            aux[i][j]++;
+                            if(matriz[i][j]->numero==0){
+                                matriz[i][j] = p;
+                            }
+                            else{
+                                if(matriz[i][j]->link==NULL && matriz[i][j]->numero!=0){
+                                    matriz[i][j]->link=p;
+                                }
+                                else{
+                                    Lista l;
+                                    l = new(Nodo);
+                                    l = matriz[i][j];
+                                    while(l->link!=NULL){
+                                        l=l->link;
+                                    }
+                                    l->link=p;
+                                }
+                            }
                         }
                     }
                 }
@@ -141,6 +383,16 @@ int main(int argc, char* argv[]){
             matriz[i][j] = p;
         }
     }
+
+    int matrizAux[9][9];
+    for(int i=0;i<9;i++)
+        for(int j=0;j<9;j++)
+            matrizAux[i][j]=0;
+
+    int contador[9];
+    for(int i=0;i<9;i++){
+        contador[i]=0;
+    }
     
 	string argumento = argv[1];
 	bool comprobar = true;
@@ -150,7 +402,7 @@ int main(int argc, char* argv[]){
     int i=0;
     int largoArgumento = argumento.size();
 
-    while(i<largoArgumento){
+    while(i<largoArgumento && comprobar){
         if(argumento[i]=='['){
             i++;
             if(esNumero(argumento[i]) && (argumento[i]>=48 && argumento[i]<57)){
@@ -217,7 +469,7 @@ int main(int argc, char* argv[]){
 
     ofstream fs("sudoku.csv");
     
-    int j=0;
+    int j=0, cont=0;
     while(j<largoDetalle){
         if(matriz[detalle[j]][detalle[j+1]]->numero==0){
             Lista p;
@@ -226,6 +478,7 @@ int main(int argc, char* argv[]){
             p->esFijo = true;
             p->link = NULL;
             matriz[detalle[j]][detalle[j+1]] = p;
+            contador[detalle[j+2]-1]++;
             j=j+3;
         }
         else{
@@ -233,20 +486,43 @@ int main(int argc, char* argv[]){
             j=j+3;
         }
     }
+
     mostrarMatriz();
     cout<<endl;
 
-	revisarEnMatriz(3);
 
+    int indice;
+    for(int i=0;i<9;i++){
+        indice=encontrarMayor(contador);
+        revisarEnMatriz(indice+1,matrizAux);//se suma uno por que los valores que entrega indice parten desde el 0
+    }
+
+    bool completo = false;
+    int contAux = 0;
+    while(contAux<=81 && completo!=true){
+        for(int i=0;i<9;i++){
+            for(int j=0;j<9;j++){
+                if(matriz[i][j]->esFijo==false && matriz[i][j]->link==NULL){
+                    matriz[i][j]->esFijo=true;
+                    eliminarValorLista(matriz[i][j]->numero,i,j);
+                }
+            }
+        }
+        verificarTodosLlenos(completo,contAux);
+    }
+    
+    cout<<endl;
     mostrarMatriz();
 
     for(int i=0;i<9;i++){
 		for(int j=0;j<9;j++){
-            if(j==8){
-                fs<<matriz[i][j]->numero;
-            }
-            else{
-			    fs<<matriz[i][j]->numero<<";";
+            if(matriz[i][j]->esFijo==true){
+                if(j==8){
+                    fs<<matriz[i][j]->numero;
+                }
+                else{
+			        fs<<matriz[i][j]->numero<<";";
+                }
             }
         }
         fs<<endl;
