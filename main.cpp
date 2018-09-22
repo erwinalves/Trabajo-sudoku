@@ -372,7 +372,10 @@ void revisarEnMatriz(int valor, int aux[][9]){
 
 int main(int argc, char* argv[]){
 
-	//Para ingresar los datos, se ingresa por ejemplo: ./ejecutable "[1;2;3][4;5;6][7;8;9]"
+	//Para ingresar los datos, se ingresa por ejemplo: ./ejecutable "[0;1;4][0;3;8][1;0;5][2;1;7][2;3;4][2;4;6][3;0;6]
+    //[3;1;9][3;2;8][3;3;5][3;4;3][3;5;7][3;6;2][3;8;4][4;1;3][4;2;5][4;4;2][5;5;4][5;7;9][5;8;3][6;4;7][6;6;3][7;0;7]
+    //[7;1;8][7;3;1][7;7;6][8;3;3][8;4;9][8;6;7][8;7;4][8;8;8]"
+
     Lista p;
     p=new(Nodo);
 	p->numero = 0;
@@ -499,20 +502,21 @@ int main(int argc, char* argv[]){
 
     bool completo = false;
     int contAux = 0;
-    while(contAux<=81 && completo!=true){
+    while(contAux<=81 && completo!=true){//procesa hasta que todos los elementos de la matriz tengan su boolean verdadero
         for(int i=0;i<9;i++){
             for(int j=0;j<9;j++){
                 if(matriz[i][j]->esFijo==false && matriz[i][j]->link==NULL){
                     matriz[i][j]->esFijo=true;
-                    eliminarValorLista(matriz[i][j]->numero,i,j);
+                    eliminarValorLista(matriz[i][j]->numero,i,j);//elimina todos los elementos que se repiten en la fila, columna y submatriz
                 }
             }
         }
-        verificarTodosLlenos(completo,contAux);
+        verificarTodosLlenos(completo,contAux);//verifica si todos los elementos booleanos de la lista son verdaderos
     }
     
     cout<<endl;
     mostrarMatriz();
+
 
     for(int i=0;i<9;i++){
 		for(int j=0;j<9;j++){
