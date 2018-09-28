@@ -462,13 +462,13 @@ int main(int argc, char* argv[]){
 
     bool completo = false;
     int contAux = 0;
-    for(int proce=1;proce<tamano;proce++){}
+    if(procesador>0){
         while(contAux<=81 && completo!=true){//procesa hasta que todos los elementos de la matriz tengan su boolean verdadero
             for(int i=0;i<9;i++){
                 for(int j=0;j<9;j++){
                     if(matriz[i][j]->esFijo==false && matriz[i][j]->link==NULL){
                         matriz[i][j]->esFijo=true;
-                        MPI_Send(&contAux,1,MPI_INT,proce,1,MPI_COMM_WORLD);
+                        MPI_Send(&contAux,1,MPI_INT,procesador,1,MPI_COMM_WORLD);
                         eliminarValorLista(matriz[i][j]->numero,i,j);//elimina todos los elementos que se repiten en la fila, columna y submatriz
                     }
                 }
