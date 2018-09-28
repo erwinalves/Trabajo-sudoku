@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <mpi.h>
-
+#include <ctime> 
 using namespace std;
 
 typedef struct Nodo{
@@ -345,6 +345,8 @@ int main(int argc, char* argv[]){
     MPI_Comm_rank(MPI_COMM_WORLD, &procesador);
 
     int resultado[9][9];
+    unsigned t0, t1;
+
 
     Lista p;
     p=new(Nodo);
@@ -511,4 +513,11 @@ int main(int argc, char* argv[]){
     cout<<"Se ha imprimido en archivo sudoku.csv"<<endl;
     MPI_Finalize();
 	return 0;
+}
+t0=clock();
+// Code to execute
+t1 = clock();
+ 
+double time = (double(t1-t0)/CLOCKS_PER_SEC);
+cout << "Execution Time: " << time << endl;
 }
