@@ -462,22 +462,20 @@ int main(int argc, char* argv[]){
 
     bool completo = false;
     int contAux = 0;
-    while(contAux<=81 && completo!=true){//procesa hasta que todos los elementos de la matriz tengan su boolean verdadero
-        for(int i=0;i<9;i++){
-            for(int j=0;j<9;j++){
-                if(matriz[i][j]->esFijo==false && matriz[i][j]->link==NULL){
-                    matriz[i][j]->esFijo=true;
-                    MPI_Send(&contAux,1,MPI_INT,procesador,1,MPI_COMM_WORLD);
-                    eliminarValorLista(matriz[i][j]->numero,i,j);//elimina todos los elementos que se repiten en la fila, columna y submatriz
+    for(int proce=1;proce<tamano;proce++){}
+        while(contAux<=81 && completo!=true){//procesa hasta que todos los elementos de la matriz tengan su boolean verdadero
+            for(int i=0;i<9;i++){
+                for(int j=0;j<9;j++){
+                    if(matriz[i][j]->esFijo==false && matriz[i][j]->link==NULL){
+                        matriz[i][j]->esFijo=true;
+                        MPI_Send(&contAux,1,MPI_INT,proce,1,MPI_COMM_WORLD);
+                        eliminarValorLista(matriz[i][j]->numero,i,j);//elimina todos los elementos que se repiten en la fila, columna y submatriz
+                    }
                 }
             }
+            verificarTodosLlenos(completo,contAux);//verifica si todos los elementos booleanos de la lista son verdaderos
+            MPI_Recv(&contAux, 1, MPI_INT, procesador, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
-        verificarTodosLlenos(completo,contAux);//verifica si todos los elementos booleanos de la lista son verdaderos
-        MPI_Recv(&contAux, 1, MPI_INT, procesador, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        procesador++;
-        if(procesador==tamano){
-            procesador = 0;
-        }  
     }
     if(procesador ==0){
         ofstream fs("sudoku.csv");
