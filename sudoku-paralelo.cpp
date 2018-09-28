@@ -30,20 +30,6 @@ bool esNumero(char valor){
     }
 }
 
-void mostrarMatriz(){
-    Lista p;
-    p = new(Nodo);
-	for(int i=0;i<9;i++){
-		for(int j=0;j<9;j++){
-            p=matriz[i][j];
-            cout<<p->numero<<" ";
-		}
-		cout<<endl;
-        if(i==2 || i==5){
-             cout<<"-----------------"<<endl;
-        }
-	}
-}
 
 void darIndiceSubMatriz(int i, int j, int &ini_i, int &ini_j,int &fin_i, int &fin_j){
     if(i>=0 && i<=2){
@@ -112,27 +98,6 @@ bool revisarColumna(int j, int valor){
     return false;
 }
 
-void mostrarListas(Lista m){
-    Lista p;
-    p = new(Nodo);
-    cout<<"matriz = ";
-    if(m->link==NULL){
-        cout<<m->numero<<endl;
-    }
-    else{
-        p=m;
-        while(p->link!=NULL){
-            cout<<p->numero;
-            p = p->link;
-            if(p->link!=NULL){
-                cout<<" -> ";
-            }
-            else{
-                cout<<" -> "<<p->numero<<endl;
-            }
-        }
-    }
-}
 
 int encontrarMayor(int vector[]){
     int aux=0;
@@ -469,14 +434,13 @@ int main(int argc, char* argv[]){
         }
     }
 
-    if(comprobar){
+    if(comprobar && procesador==0){
         cout<<"Guardados"<<endl;
     }
     else{
         cout<<"Error de formato"<<endl;
     }
-
-    ofstream fs("sudoku.csv");
+    
     
     int j=0, cont=0;
     while(j<largoDetalle){
@@ -496,8 +460,7 @@ int main(int argc, char* argv[]){
         }
     }
 
-    //mostrarMatriz();
-    //cout<<endl;
+  
 
 
     int indice;
@@ -525,7 +488,8 @@ int main(int argc, char* argv[]){
             procesador = 0;
         }  
     }
-
+    if(procesador ==0){
+        ofstream fs("sudoku.csv");
     for(int i=0;i<9;i++){
 		for(int j=0;j<9;j++){
             if(matriz[i][j]->esFijo==true){
@@ -540,6 +504,9 @@ int main(int argc, char* argv[]){
         fs<<endl;
     }
     fs.close();
+    
+
+
 
     cout<<"Se ha imprimido en archivo sudoku.csv"<<endl;
     MPI_Finalize();

@@ -3,13 +3,13 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
-//#include <mpi.h>
+
 
 using namespace std;
 
 typedef struct Nodo{
     int numero;
-    bool esFijo; //para comprobar si es ingresado por la consola
+    bool esFijo; //bool para comprobar si el numero es ingresado por la consola 
     Nodo* link;
 };
 typedef Nodo* Lista;
@@ -372,7 +372,7 @@ void revisarEnMatriz(int valor, int aux[][9]){
 
 int main(int argc, char* argv[]){
 
-	//Para ingresar los datos, se ingresa por ejemplo: ./ejecutable "[0;1;4][0;3;8][1;0;5][2;1;7][2;3;4][2;4;6][3;0;6]
+    //Para ingresar los datos, se ingresa por ejemplo: ./ejecutable "[0;1;4][0;3;8][1;0;5][2;1;7][2;3;4][2;4;6][3;0;6]
     //[3;1;9][3;2;8][3;3;5][3;4;3][3;5;7][3;6;2][3;8;4][4;1;3][4;2;5][4;4;2][5;5;4][5;7;9][5;8;3][6;4;7][6;6;3][7;0;7]
     //[7;1;8][7;3;1][7;7;6][8;3;3][8;4;9][8;6;7][8;7;4][8;8;8]"
 
